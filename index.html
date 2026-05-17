@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Movies Recommender</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-100">
+  <!-- Login View -->
+  <section id="loginView" class="min-h-screen flex items-center justify-center p-6">
+    <div class="w-full max-w-md bg-white/10 backdrop-blur rounded-2xl shadow-xl p-8 space-y-6 border border-white/10">
+      <div class="text-center space-y-2">
+        <h1 class="text-3xl font-bold">🎬 Movies Recommender</h1>
+        <p class="text-slate-300">Personalized suggestions powered by MongoDB</p>
+      </div>
+      <div class="space-y-3">
+        <label class="block text-sm text-slate-300">Username</label>
+        <input id="loginUsername" class="w-full px-4 py-3 rounded-lg bg-slate-900/60 border border-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="e.g., Shiva">
+      </div>
+      <button id="loginSubmit" class="w-full py-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 transition font-semibold">Enter</button>
+      <p class="text-xs text-slate-400 text-center">Tip: You can use any name. A profile will be created if it doesn't exist.</p>
+    </div>
+  </section>
+
+  <!-- App View -->
+  <section id="appView" class="hidden">
+    <header class="border-b border-white/10">
+      <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">🎬</span>
+          <h1 class="text-2xl font-bold">Movies Recommender</h1>
+        </div>
+        <div class="flex items-center gap-3">
+          <span id="userBadge" class="text-slate-300"></span>
+          <button id="logoutBtn" class="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-6 space-y-6">
+      <!-- Search & Watched -->
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-white/10 backdrop-blur rounded-2xl border border-white/10 p-5 space-y-4">
+          <h2 class="font-semibold text-lg">Search</h2>
+          <div class="flex gap-2">
+            <input id="q" class="flex-1 px-4 py-3 rounded-lg bg-slate-900/60 border border-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Search by title...">
+            <button id="searchBtn" class="px-4 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500">Search</button>
+          </div>
+          <ul id="results" class="space-y-2"></ul>
+        </div>
+
+        <div class="bg-white/10 backdrop-blur rounded-2xl border border-white/10 p-5 space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="font-semibold text-lg">Watched</h2>
+            <button id="refreshWatchedBtn" class="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm">Refresh</button>
+          </div>
+          <ul id="watched" class="space-y-2"></ul>
+        </div>
+      </div>
+
+      <!-- Recommendations -->
+      <div class="bg-white/10 backdrop-blur rounded-2xl border border-white/10 p-5 space-y-4">
+        <div class="flex flex-wrap items-end gap-3">
+          <h2 class="font-semibold text-lg">Recommendations</h2>
+          <label class="text-sm">Min Year
+            <input id="minYear" type="number" class="ml-1 px-2 py-1 rounded bg-slate-900/60 border border-white/10 w-28">
+          </label>
+          <label class="text-sm">Min Votes
+            <input id="minVotes" type="number" class="ml-1 px-2 py-1 rounded bg-slate-900/60 border border-white/10 w-28">
+          </label>
+          <label class="text-sm">w<sub>g</sub>
+            <input id="wg" type="number" step="0.05" class="ml-1 px-2 py-1 rounded bg-slate-900/60 border border-white/10 w-20" value="0.4">
+          </label>
+          <label class="text-sm">w<sub>d</sub>
+            <input id="wd" type="number" step="0.05" class="ml-1 px-2 py-1 rounded bg-slate-900/60 border border-white/10 w-20" value="0.25">
+          </label>
+          <label class="text-sm">w<sub>a</sub>
+            <input id="wa" type="number" step="0.05" class="ml-1 px-2 py-1 rounded bg-slate-900/60 border border-white/10 w-20" value="0.15">
+          </label>
+          <button id="recBtn" class="px-4 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-500">Get Recs</button>
+          <button id="exportRecsBtn" class="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm">Export CSV</button>
+        </div>
+        <div class="overflow-auto">
+          <table class="min-w-full text-sm">
+            <thead class="bg-white/10">
+              <tr>
+                <th class="text-left px-3 py-2">Title</th>
+                <th class="text-left px-3 py-2">Year</th>
+                <th class="text-left px-3 py-2">★ Rating</th>
+                <th class="text-left px-3 py-2">Votes</th>
+                <th class="text-left px-3 py-2">Score</th>
+                <th class="text-left px-3 py-2">Genres</th>
+                <th class="text-left px-3 py-2">Directors</th>
+                <th class="text-left px-3 py-2">Top Cast</th>
+              </tr>
+            </thead>
+            <tbody id="recsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Analytics -->
+      <div class="bg-white/10 backdrop-blur rounded-2xl border border-white/10 p-5 space-y-4">
+        <div class="flex flex-wrap gap-2 items-end">
+          <h2 class="font-semibold text-lg mr-2">Analytics Dashboard</h2>
+
+          <label class="text-xs">minShare
+            <input id="dsMinShare" type="number" step="0.05" value="0.6" class="ml-1 px-2 py-1 rounded bg-slate-900/60 border border-white/10 w-20">
+          </label>
+          <label class="text-xs">minFilms
+            <input id="dsMinFilms" type="number" value="3" class="ml-1 px-2 py-1 rounded bg-slate-900/60 border border-white/10 w-20">
+          </label>
+          <button data-ana="director" class="anaBtn px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500">Director Specialists</button>
+
+          <div class="text-xs relative">
+            <label>Actor</label>
+            <div class="relative">
+              <input id="actorName" type="text" value="Henry Robert" autocomplete="off"
+                     class="ml-1 px-2 py-1 rounded bg-slate-900/60 border border-white/10 w-48"
+                     placeholder="Actor name">
+              <ul id="actorSuggest" class="absolute left-0 right-0 mt-1 bg-slate-900/95 border border-white/10 rounded-lg shadow-lg hidden max-h-56 overflow-auto z-10"></ul>
+            </div>
+          </div>
+          <button data-ana="actor" class="anaBtn px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500">Actor Collab</button>
+
+          <button data-ana="genre" class="anaBtn px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500">Genre by Decade</button>
+          <button data-ana="pairs" class="anaBtn px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500">Top Actor–Director Pairs</button>
+
+          <button id="exportAnaBtn" class="ml-auto px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm">Export CSV</button>
+        </div>
+        <div class="overflow-auto">
+          <table class="min-w-full text-sm">
+            <thead id="anaThead" class="bg-white/10"></thead>
+            <tbody id="anaTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 hidden px-4 py-3 rounded-lg bg-black/70 text-white text-sm"></div>
+  <script src="/app.js"></script>
+</body>
+</html>
