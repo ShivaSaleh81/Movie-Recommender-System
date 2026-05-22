@@ -37,21 +37,6 @@ Weights `wg`, `wd`, and `wa` are adjustable from the UI.
 
 ---
 
-## 🗂️ Project Structure
-
-```
-├── server.js              # Express API server
-├── app.js                 # Frontend logic (Vanilla JS)
-├── index.html             # Single-page UI (Tailwind CSS)
-├── queries.js             # mongosh helper queries
-├── recommend.js           # Standalone mongosh recommender script
-├── load-movies-node.js    # One-time data loader
-├── movies.json            # Movie dataset (10 000 documents)
-└── package.json
-```
-
----
-
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -155,14 +140,3 @@ db.movies.aggregate([
 ```
 
 Full query library is in [`queries.js`](./queries.js).
-
----
-
-## 🛠️ Tech Stack
-
-| Layer      | Technology                          |
-|------------|-------------------------------------|
-| Database   | MongoDB 6 + Aggregation Pipeline    |
-| Backend    | Node.js, Express 5                  |
-| Frontend   | Vanilla JS, Tailwind CSS (CDN)      |
-| Data Load  | Node.js `fs.readFileSync` + `JSON.parse` |
